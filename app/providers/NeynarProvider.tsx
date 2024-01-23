@@ -61,6 +61,25 @@ export const NeynarProvider: React.FC<{ children: React.ReactNode, apiKey: strin
     fetchData();
   }, []);
 
+  // const postCast = async (cast: any) => {
+  //   try {
+  //     const respBody = {
+  //       parent: cast.hash,
+  //       signer_uuid: farcasterUser?.signer_uuid,
+  //       text: cast.text,
+  //     };
+  //     await fetch(`${API_URL}/neynar/cast`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(cast),
+  //     });
+  //   } catch (error) {
+  //     console.error('Failed to post cast', error);
+  //   }
+  // };
+
   const postReaction = async (type: 'like' | 'recast', hash: string) => {
     try {
       await fetch('https://api.neynar.com/v2/farcaster/reaction', {
@@ -93,6 +112,14 @@ export const useLogin = () => {
     throw new Error('useLogin must be used within a NeynarProvider');
   }
   return context;
+};
+
+export const usePostCast = () => {
+  const context = useContext(NeynarContext);
+  if (!context) {
+    throw Error('usePostCast must be used within a NeynarProvider');
+  }
+  return context.postCast;
 };
 
 export const useReaction = () => {

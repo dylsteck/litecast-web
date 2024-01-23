@@ -5,6 +5,7 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/@mod-protocol/react-ui-shadcn/dist/**/*.{ts,tsx,css,js}",
   ],
   theme: {
     extend: {
@@ -15,6 +16,11 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // load the text styling
+    require("@tailwindcss/typography"),
+    // make sure the open popover animations work
+    require("tailwindcss-animate")
+  ],
 };
 export default config;

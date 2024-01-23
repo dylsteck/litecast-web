@@ -1,0 +1,87 @@
+import { useEditor, EditorContent } from "@mod-protocol/react-editor";
+import { EmbedsEditor } from "@mod-protocol/react-ui-shadcn/dist/lib/embeds";
+import { Button } from "@mod-protocol/react-ui-shadcn/dist/components/ui/button";
+import { Embed, ModManifest, fetchUrlMetadata, handleAddEmbed, handleOpenFile, handleSetInput } from "@mod-protocol/core";
+import { Channel, getFarcasterChannels, getFarcasterMentions } from "@mod-protocol/farcaster";
+import { MentionList } from "@mod-protocol/react-ui-shadcn/dist/components/mention-list";
+import { ChannelList } from "@mod-protocol/react-ui-shadcn/dist/components/channel-list";
+import { ChannelPicker } from "@mod-protocol/react-ui-shadcn/dist/components/channel-picker";
+import { CastLengthUIIndicator } from "@mod-protocol/react-ui-shadcn/dist/components/cast-length-ui-indicator";
+import { createRenderMentionsSuggestionConfig } from "@mod-protocol/react-ui-shadcn/dist/lib/mentions";
+import { useLogin } from "../providers/NeynarProvider";
+
+const MOD_API_URL = "https://api.modprotocol.org/api";
+const FCKIT_API_URL = "https://api.farcasterkit.com";
+ 
+// use our MOD_API_URL, self host our API, or use your own API.
+const getUrlMetadata = fetchUrlMetadata(MOD_API_URL);
+const getResults = getFarcasterMentions(MOD_API_URL);
+const getChannels = getFarcasterChannels(MOD_API_URL);
+ 
+export default function ModEditor() {
+  const { farcasterUser } = useLogin();
+
+  const onSubmit = async ({ text, embeds, channel }: { text: string, embeds: Embed[], channel: Channel }): Promise<boolean> => {
+    
+    try {
+      const respBody = {
+        // parent: hash,
+        signer_uuid: farcasterUser?.signer_uuid,
+        text: text,
+        channel_id: channel ? channel : ''
+      };
+      console.log("CASTING ", respBody);
+      await fetch(`${FCKIT_API_URL}/neynar/cast`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(respBody),
+      });
+    } catch (error) {
+      console.error('Failed to post cast', error);
+      return false;
+    }
+    return true;
+  };
+
+ const { editor, getEmbeds, setEmbeds, handleSubmit, getText, setChannel, getChannel } = useEditor({
+    fetchUrlMetadata: getUrlMetadata,
+    onError: (error) => console.error(error),
+    onSubmit,
+    linkClassName: "text-blue-600",
+    renderChannelsSuggestionConfig: createRenderMentionsSuggestionConfig({
+      getResults: (query) => getChannels(query, true),
+      RenderList: ChannelList,
+    }),
+    renderMentionsSuggestionConfig: createRenderMentionsSuggestionConfig({
+      getResults: getResults,
+      RenderList: MentionList,
+    }),
+    initialText: "Cast something",
+    // TODO: fix placeholdertext, isn't showing up for some reason
+  });
+  return (
+    <div className="border-b border-black z-index-50">
+      <form onSubmit={handleSubmit}>
+        <EditorContent
+            editor={editor}
+            autoFocus
+            className="w-full h-auto max-h-full p-3 pl-4"
+        />
+        {/* <EmbedsEditor embeds={getEmbeds()} setEmbeds={setEmbeds} /> */}
+        <div className="flex flex-row gap-4 items-center p-3 pl-4">
+          <ChannelPicker
+            getChannels={getChannels}
+            onSelect={setChannel}
+            value={getChannel()}
+          />
+          <CastLengthUIIndicator getText={getText} />
+          <Button type="submit" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 text-white bg-[#855DCD]">
+            Cast
+          </Button>
+        </div>
+      </form>
+    </div>
+  )
+};

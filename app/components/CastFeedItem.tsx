@@ -1,4 +1,4 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 import { NeynarCastV2 } from "../types";
 import { GHOST_USER_PFP_URL } from "../utils/consts";
 import { FaComment, FaHeart } from "react-icons/fa";
@@ -9,7 +9,7 @@ import { getRelativeTime } from "../utils/getRelativeTime";
 export default function CastFeedItem({ cast }: { cast: NeynarCastV2 }){
     return(
         <div className="border-b border-black flex flex-row gap-2 p-3 pl-4">
-            <Image src={cast.author.pfp_url ?? GHOST_USER_PFP_URL} width={12} height={12} className="w-7 h-7 rounded-full" alt={`PFP for @${cast.author.username}`} />
+            <img src={cast.author.pfp_url ?? GHOST_USER_PFP_URL} width={12} height={12} className="w-7 h-7 rounded-full" alt={`PFP for @${cast.author.username}`} />
             <div>
                 <div className="flex flex-row gap-1">
                     <p>{cast.author.display_name}</p>
