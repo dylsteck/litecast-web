@@ -114,14 +114,6 @@ export const useLogin = () => {
   return context;
 };
 
-export const usePostCast = () => {
-  const context = useContext(NeynarContext);
-  if (!context) {
-    throw Error('usePostCast must be used within a NeynarProvider');
-  }
-  return context.postCast;
-};
-
 export const useReaction = () => {
   const context = useContext(NeynarContext);
   if (!context) {
