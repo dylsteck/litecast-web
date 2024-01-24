@@ -5,3 +5,7 @@
 .tiptap, .ProseMirror{
     min-height: 50px !important;
 }
+
+.bg-popover{
+    z-index: 50 !important;
+}

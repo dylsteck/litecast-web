@@ -50,9 +50,13 @@ export default function SignInWithNeynar(){
 
     return(
       <div
-          className="neynar_signin"
+          className="neynar_signin pt-2 pr-0 md:pr-4"
           data-client_id={neynarClientId}
           data-success-callback="onSignInSuccess"
+          data-width="147px"
+          data-height="29px"
+          data-font_size="13px"
+          data-padding="6px 13px"
           data-theme="light">
       </div>
     )

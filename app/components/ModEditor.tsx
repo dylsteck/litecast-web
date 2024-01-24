@@ -9,6 +9,9 @@ import { ChannelPicker } from "@mod-protocol/react-ui-shadcn/dist/components/cha
 import { CastLengthUIIndicator } from "@mod-protocol/react-ui-shadcn/dist/components/cast-length-ui-indicator";
 import { createRenderMentionsSuggestionConfig } from "@mod-protocol/react-ui-shadcn/dist/lib/mentions";
 import { useLogin } from "../providers/NeynarProvider";
+import { defaultRichEmbedMod } from "@mod-protocol/mod-registry";
+import { renderers } from '@mod-protocol/react-ui-shadcn/dist/renderers';
+import { RichEmbed } from "@mod-protocol/react";
 
 const MOD_API_URL = "https://api.modprotocol.org/api";
 const FCKIT_API_URL = "https://api.farcasterkit.com";
@@ -20,17 +23,19 @@ const getChannels = getFarcasterChannels(MOD_API_URL);
  
 export default function ModEditor() {
   const { farcasterUser } = useLogin();
-
+  const initialText = 'Cast something';
   const onSubmit = async ({ text, embeds, channel }: { text: string, embeds: Embed[], channel: Channel }): Promise<boolean> => {
     
     try {
+      if(text.length === 0 || text === initialText){
+        throw new Error('You submitted a blank cast. Please try again.')
+      }
       const respBody = {
         // parent: hash,
         signer_uuid: farcasterUser?.signer_uuid,
         text: text,
         channel_id: channel ? channel : ''
       };
-      console.log("CASTING ", respBody);
       await fetch(`${FCKIT_API_URL}/neynar/cast`, {
         method: 'POST',
         headers: {
@@ -58,7 +63,7 @@ export default function ModEditor() {
       getResults: getResults,
       RenderList: MentionList,
     }),
-    initialText: "Cast something",
+    initialText: initialText,
     // TODO: fix placeholdertext, isn't showing up for some reason
   });
   return (
@@ -69,14 +74,27 @@ export default function ModEditor() {
             autoFocus
             className="w-full h-auto max-h-full p-3 pl-4"
         />
-        {/* <EmbedsEditor embeds={getEmbeds()} setEmbeds={setEmbeds} /> */}
         <div className="flex flex-row gap-4 items-center p-3 pl-4">
           <ChannelPicker
             getChannels={getChannels}
             onSelect={setChannel}
             value={getChannel()}
           />
-          <CastLengthUIIndicator getText={getText} />
+          {/* TODO: Get EmbedsEditor and CastLengthUIIndicator to show up, not working ATM */}
+          {/* <EmbedsEditor
+            embeds={getEmbeds()}
+            setEmbeds={setEmbeds}
+            RichEmbed={({ embed }) => (
+              <RichEmbed
+                api={MOD_API_URL}
+                defaultRichEmbedMod={defaultRichEmbedMod}
+                mods={[defaultRichEmbedMod]}
+                embed={embed}
+                renderers={renderers}
+              />
+            )}
+          />
+          <CastLengthUIIndicator getText={getText} /> */}
           <Button type="submit" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 text-white bg-[#855DCD]">
             Cast
           </Button>
