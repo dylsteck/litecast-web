@@ -5,10 +5,11 @@ import { FaComment, FaHeart } from "react-icons/fa";
 import { FaArrowsSpin } from "react-icons/fa6";
 import { getRelativeTime } from "../utils/getRelativeTime";
 import Link from "next/link";
+import { NeynarCastV1 } from "../hooks/useNeynarThread";
 import { ExpandableImage } from "./ExpandableImage";
 
 
-export default function CastFeedItem({ cast }: { cast: NeynarCastV2 }){
+export default function ThreadFeedItem({ cast }: { cast: NeynarCastV1 }){
 
     const renderImages = () => {
         const regex = /https?:\/\/\S+\.(?:jpg|jpeg|png|gif)/g;
@@ -21,19 +22,19 @@ export default function CastFeedItem({ cast }: { cast: NeynarCastV2 }){
         const allMatches = Array.from(new Set([...textMatches, ...embedMatches]));
       
         return allMatches.map((url, index) => (
-            <ExpandableImage imageUrl={url ?? GHOST_USER_PFP_URL} rounded={false} key={index} />
+            <ExpandableImage imageUrl={url} rounded={false} key={index} />
         ));
       };
 
     return(
         <div className="border-b border-black flex flex-row gap-2 p-3 pl-4">
             <Link href={`/${cast.author.username}`} className="min-w-7 max-w-12 min-h-7 max-h-12">
-                <img src={cast.author.pfp_url ?? GHOST_USER_PFP_URL} width={12} height={12} className="w-7 h-7 rounded-full" alt={`PFP for @${cast.author.username}`} />
+                <img src={cast.author.pfp.url ?? GHOST_USER_PFP_URL} width={12} height={12} className="w-7 h-7 rounded-full" alt={`PFP for @${cast.author.username}`} />
             </Link>
             <div>
                 <div className="flex flex-row gap-1">
                     <Link href={`/${cast.author.username}`}>
-                        <p>{cast.author.display_name}</p>
+                        <p>{cast.author.displayName}</p>
                     </Link>
                     <p className="text-gray-700/80">@{cast.author.username}</p>
                     <p className="text-gray-700/80">· {getRelativeTime(cast.timestamp)}</p>
@@ -49,7 +50,7 @@ export default function CastFeedItem({ cast }: { cast: NeynarCastV2 }){
                 <div className="flex flex-row gap-2 pt-3 text-black/70 text-sm">
                     <div className="flex flex-row gap-1 items-center">
                         <FaHeart size={10} />
-                        <p>{cast.reactions.likes.length} likes</p>
+                        <p>{cast.reactions.count} likes</p>
                     </div>
                     <div className="flex flex-row gap-1 items-center">
                         <FaComment size={10} />
@@ -57,7 +58,7 @@ export default function CastFeedItem({ cast }: { cast: NeynarCastV2 }){
                     </div>
                     <div className="flex flex-row gap-1 items-center">
                         <FaArrowsSpin size={10} />
-                        <p>{cast.reactions.recasts.length} recasts</p> 
+                        <p>{cast.recasts.count} recasts</p> 
                     </div>
                 </div>
             </div>

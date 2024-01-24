@@ -21,17 +21,19 @@ const getUrlMetadata = fetchUrlMetadata(MOD_API_URL);
 const getResults = getFarcasterMentions(MOD_API_URL);
 const getChannels = getFarcasterChannels(MOD_API_URL);
  
-export default function ModEditor() {
+// todo: make default state for hash null and change type to string | null
+export default function ModEditor({ hash }: { hash?: string }) {
   const { farcasterUser } = useLogin();
-  const initialText = 'Cast something';
+  const initialText = hash ? 'Reply' : 'Cast something';
   const onSubmit = async ({ text, embeds, channel }: { text: string, embeds: Embed[], channel: Channel }): Promise<boolean> => {
     
     try {
       if(text.length === 0 || text === initialText){
         throw new Error('You submitted a blank cast. Please try again.')
+        alert('You submitted a blank cast. Please try again.')
       }
       const respBody = {
-        // parent: hash,
+        parent: hash,
         signer_uuid: farcasterUser?.signer_uuid,
         text: text,
         channel_id: channel ? channel : ''
@@ -45,8 +47,10 @@ export default function ModEditor() {
       });
     } catch (error) {
       console.error('Failed to post cast', error);
+      alert(error);
       return false;
     }
+    alert('Casted successfully!')
     return true;
   };
 
@@ -75,11 +79,13 @@ export default function ModEditor() {
             className="w-full h-auto max-h-full p-3 pl-4"
         />
         <div className="flex flex-row gap-4 items-center p-3 pl-4">
-          <ChannelPicker
-            getChannels={getChannels}
-            onSelect={setChannel}
-            value={getChannel()}
-          />
+          {!hash && 
+            <ChannelPicker
+              getChannels={getChannels}
+              onSelect={setChannel}
+              value={getChannel()}
+            />
+          }
           {/* TODO: Get EmbedsEditor and CastLengthUIIndicator to show up, not working ATM */}
           {/* <EmbedsEditor
             embeds={getEmbeds()}
