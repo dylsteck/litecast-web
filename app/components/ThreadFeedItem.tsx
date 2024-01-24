@@ -7,6 +7,7 @@ import { getRelativeTime } from "../utils/getRelativeTime";
 import Link from "next/link";
 import { NeynarCastV1 } from "../hooks/useNeynarThread";
 import { ExpandableImage } from "./ExpandableImage";
+import CastReactionItem from "./CastReactionItem";
 
 
 export default function ThreadFeedItem({ cast }: { cast: NeynarCastV1 }){
@@ -25,12 +26,12 @@ export default function ThreadFeedItem({ cast }: { cast: NeynarCastV1 }){
             <ExpandableImage imageUrl={url} rounded={false} key={index} />
         ));
       };
-
     return(
         <div className="border-b border-black flex flex-row gap-2 p-3 pl-4">
-            <Link href={`/${cast.author.username}`} className="min-w-7 max-w-12 min-h-7 max-h-12">
+            {cast.author.pfp && <Link href={`/${cast.author.username}`} className="min-w-7 max-w-12 min-h-7 max-h-12">
                 <img src={cast.author.pfp.url ?? GHOST_USER_PFP_URL} width={12} height={12} className="w-7 h-7 rounded-full" alt={`PFP for @${cast.author.username}`} />
             </Link>
+            }
             <div>
                 <div className="flex flex-row gap-1">
                     <Link href={`/${cast.author.username}`}>
@@ -48,18 +49,12 @@ export default function ThreadFeedItem({ cast }: { cast: NeynarCastV1 }){
                     </div>
                 </p>
                 <div className="flex flex-row gap-2 pt-3 text-black/70 text-sm">
-                    <div className="flex flex-row gap-1 items-center">
-                        <FaHeart size={10} />
-                        <p>{cast.reactions.count} likes</p>
-                    </div>
+                    <CastReactionItem type="like" count={cast.reactions.count} hash={cast.hash} />
                     <div className="flex flex-row gap-1 items-center">
                         <FaComment size={10} />
                         <p>{cast.replies.count} replies</p>
                     </div>
-                    <div className="flex flex-row gap-1 items-center">
-                        <FaArrowsSpin size={10} />
-                        <p>{cast.recasts.count} recasts</p> 
-                    </div>
+                    <CastReactionItem type="recast" count={cast.recasts.count} hash={cast.hash} />
                 </div>
             </div>
         </div>

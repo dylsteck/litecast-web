@@ -17,6 +17,7 @@ const ThreadFeed: FunctionComponent<ThreadFeedProps> = ({
     const { casts, loading, error } = useNeynarThread(hash, farcasterUser?.fid ?? 616);
     return(
         <div className="flex flex-col w-full gap-1 pb-4 overflow-y-auto">
+          {/* todo: fix so ModEditor dynamically shows up right under the cast to reply to */}
             {casts && casts.length > 0 &&
             <>
               <ThreadFeedItem cast={casts[0]} />

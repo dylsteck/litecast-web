@@ -3,7 +3,6 @@ import { usePathname } from "next/navigation";
 import CastFeed from "../../components/CastFeed";
 import PageLayout from "../../components/PageLayout";
 import { useLogin } from "../../providers/NeynarProvider";
-import UserDetails from "../../components/UserDetails";
 import useNeynarThread from "@/app/hooks/useNeynarThread";
 import ThreadFeed from "@/app/components/ThreadFeed";
 

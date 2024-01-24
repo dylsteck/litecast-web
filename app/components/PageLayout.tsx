@@ -10,6 +10,7 @@ import { BellIcon, HomeIcon, MagnifyingGlassIcon } from '@heroicons/react/24/out
 import CastIcon from '../components/CastIcon';
 
 function PageLayoutLeft(){
+    const { farcasterUser } = useLogin();
     const alertComingSoon = (featureName: string) => {
         alert(`Support for ${featureName} is coming soon!`)
     }
@@ -22,6 +23,9 @@ function PageLayoutLeft(){
             <MagnifyingGlassIcon className="w-6 h-6" onClick={() => alertComingSoon('Search')} />
             <BellIcon className="w-6 h-6" onClick={() => alertComingSoon('Notifications')} />
             <CastIcon width={6} height={6} onClick={() => alertComingSoon('Cast Modal')} />
+            <Link href={`/${farcasterUser?.fname}`}>
+              <img src={farcasterUser?.pfp} alt={`PFP for @${farcasterUser?.fname}`} width={6} height={6} className="w-6 h-6 object-contain" />
+            </Link>
           </div>
         </nav>
     )

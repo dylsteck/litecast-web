@@ -87,7 +87,7 @@ export type NeynarCastV1 =  {
   };
 }
 
-type NeynarCastThreadV1Response =  {
+export type NeynarCastThreadV1Response =  {
   result: {
       casts: Array<NeynarCastV1>;
   };

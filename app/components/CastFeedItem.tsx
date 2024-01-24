@@ -6,6 +6,7 @@ import { FaArrowsSpin } from "react-icons/fa6";
 import { getRelativeTime } from "../utils/getRelativeTime";
 import Link from "next/link";
 import { ExpandableImage } from "./ExpandableImage";
+import CastReactionItem from "./CastReactionItem";
 
 
 export default function CastFeedItem({ cast }: { cast: NeynarCastV2 }){
@@ -47,18 +48,12 @@ export default function CastFeedItem({ cast }: { cast: NeynarCastV2 }){
                     </div>
                 </p>
                 <div className="flex flex-row gap-2 pt-3 text-black/70 text-sm">
-                    <div className="flex flex-row gap-1 items-center">
-                        <FaHeart size={10} />
-                        <p>{cast.reactions.likes.length} likes</p>
-                    </div>
+                    <CastReactionItem type="like" count={cast.reactions.likes.length} hash={cast.hash} />
                     <div className="flex flex-row gap-1 items-center">
                         <FaComment size={10} />
                         <p>{cast.replies.count} replies</p>
                     </div>
-                    <div className="flex flex-row gap-1 items-center">
-                        <FaArrowsSpin size={10} />
-                        <p>{cast.reactions.recasts.length} recasts</p> 
-                    </div>
+                    <CastReactionItem type="recast" count={cast.reactions.recasts.length} hash={cast.hash} />
                 </div>
             </div>
         </div>
