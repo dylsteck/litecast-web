@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect } from "react";
 import { useLatestCasts, useLogin } from "../providers/NeynarProvider";
 import { NeynarCastV2 } from "../types";
 import CastFeedItem from "./CastFeedItem";
@@ -14,6 +14,10 @@ const CastFeed: FunctionComponent<CastFeedProps> = ({
   username,
 }) => {
   const { casts, isLoading, isReachingEnd, loadMore } = useLatestCasts();
+
+  useEffect(() => {
+    console.log('latest casts', casts);
+  }, [casts])
   const { farcasterUser } = useLogin();
   // note: should add error to this
   return (

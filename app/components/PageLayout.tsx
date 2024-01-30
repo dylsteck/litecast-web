@@ -20,7 +20,9 @@ function PageLayoutLeft(){
             <Link href="/">
               <HomeIcon className="w-6 h-6" />
             </Link>
-            <MagnifyingGlassIcon className="w-6 h-6" onClick={() => alertComingSoon('Search')} />
+            <Link href="/search">
+              <MagnifyingGlassIcon className="w-6 h-6" />
+            </Link>
             <BellIcon className="w-6 h-6" onClick={() => alertComingSoon('Notifications')} />
             <CastIcon width={6} height={6} onClick={() => alertComingSoon('Cast Modal')} />
             <Link href={`/${farcasterUser?.fname}`}>
