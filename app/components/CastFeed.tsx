@@ -1,8 +1,9 @@
-import { FunctionComponent, useEffect } from "react";
+import { FunctionComponent } from "react";
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { useLatestCasts, useLogin } from "../providers/NeynarProvider";
-import { NeynarCastV2 } from "../types";
 import CastFeedItem from "./CastFeedItem";
 import ModEditor from "./ModEditor";
+import { NeynarCastV2 } from "../types";
 
 interface CastFeedProps {
   castEditorVisible?: boolean;
@@ -14,21 +15,29 @@ const CastFeed: FunctionComponent<CastFeedProps> = ({
   username,
 }) => {
   const { casts, isLoading, isReachingEnd, loadMore } = useLatestCasts();
-
-  useEffect(() => {
-    console.log('latest casts', casts);
-  }, [casts])
   const { farcasterUser } = useLogin();
-  // note: should add error to this
+
+  const handleLoadMore = () => {
+    loadMore();
+  }
+
   return (
-    <div className="flex flex-col w-full gap-1 pb-4 overflow-y-auto">
+    <div id="scrollableDiv" style={{ height: '800px', overflow: 'auto' }}>
       {farcasterUser && castEditorVisible && <ModEditor />}
-      {casts &&
-        casts.map((item: NeynarCastV2, index) => {
-          return (
+      <InfiniteScroll
+        dataLength={casts.length}
+        next={handleLoadMore}
+        hasMore={!isLoading && !isReachingEnd}
+        loader={<p>Loading...</p>}
+        endMessage={<p>No more data to load.</p>}
+        scrollableTarget="scrollableDiv"
+      >
+        <div className="flex flex-col w-full gap-1 pb-4">
+          {casts.map((item: NeynarCastV2) => (
             <CastFeedItem cast={item} key={`cast-feed-item-${item.hash}`} />
-          );
-        })}
+          ))}
+        </div>
+      </InfiniteScroll>
     </div>
   );
 };

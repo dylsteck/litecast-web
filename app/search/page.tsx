@@ -119,7 +119,10 @@ type SearchcasterResponse = {
   };
 };
 
+export type Category = 'Casts' | 'Channels' | 'Users';
+
 export default function SearchPage(){
+  const [category, setCategory] = useState<Category>('Casts');
   const [query, setQuery] = useState<string>('');
   const [searchResult, setSearchResults] = useState<SearchcasterResponse | null>(null);
   const { farcasterUser: authenticatedUser } = useLogin();
@@ -132,7 +135,6 @@ export default function SearchPage(){
           throw new Error(`Error: ${response.status}`);
         }
         const data = await response.json() as SearchcasterResponse;
-        console.log('data', data);
         setSearchResults(data);
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -141,26 +143,20 @@ export default function SearchPage(){
     }
   }, [query]);
 
-  const handleOnInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
-  };
-
   useEffect(() => {
     getSearch();
   }, [getSearch]);
 
+  const handleSearch = (value: string, newCategory: string) => {
+    setQuery(value);
+    newCategory !== category && setCategory(newCategory as Category);
+  }
+
   return(
-    <PageLayout title="Search">
-      <div className="m-4">
-        <input 
-          type="text" 
-          placeholder="Search anything..." 
-          className="text-lg text-black/80 placeholder-black/80 outline-none"
-          onChange={handleOnInputChange} />
+    <PageLayout title="Search" isSearch={true} handleSearch={(value: string, category: string) => handleSearch(value, category)}>
         {searchResult !== null && searchResult.casts && searchResult.casts.map((searchCast: SearchcasterCast, index: number) => {
             return <SearchCastItem cast={searchCast} key={`search-cast-${index}`} />
         })}
-      </div>
     </PageLayout>
   )
 }

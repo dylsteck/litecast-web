@@ -33,7 +33,7 @@ function CastFrame({ hash, frame, signerUuid }: { hash: string, frame: NeynarFra
                 method: "POST",
                 headers: {
                     "accept": "application/json",
-                    "api_key": "11BDFAF6-D4D4-460D-9E9F-7CB96DAB7D39",
+                    "api_key": "<your neynar api key>",
                     "content-type": "application/json"
                 },
                 body: JSON.stringify({
