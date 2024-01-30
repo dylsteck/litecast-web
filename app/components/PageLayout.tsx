@@ -23,13 +23,14 @@ function PageLayoutLeft(){
             <Link href="/search">
               <MagnifyingGlassIcon className="w-6 h-6 text-[#616161]" />
             </Link>
-            <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Frame Icon */}
+            {/* <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="2.58579" y="2.97214" width="17.1324" height="17.1324" rx="2.45291" stroke="#616161" stroke-width="2.33955"/>
               <path d="M0.850098 1.23633L7.30301 7.68924" stroke="white" stroke-width="2.37739"/>
               <path d="M0.850098 21.9536L7.30301 15.5007" stroke="white" stroke-width="2.37739"/>
               <path d="M21.8501 1.23633L15.3972 7.68924" stroke="white" stroke-width="2.37739"/>
               <path d="M21.8501 21.9536L15.3972 15.5007" stroke="white" stroke-width="2.37739"/>
-              </svg>
+              </svg> */}
             <BellIcon className="w-6 h-6 text-[#616161]" onClick={() => alertComingSoon('Notifications')} />
             <Link href={`/${farcasterUser?.fname}`}>
               <img src={farcasterUser?.pfp} alt={`PFP for @${farcasterUser?.fname}`} width={6} height={6} className="w-6 h-6 object-contain" />
@@ -54,8 +55,8 @@ function PageLayoutCenter({ title, children, isSearch = false, handleSearch }: {
                   className="text-lg text-black/80 outline-none"
                 >
                   <option value="Casts">Casts</option>
-                  <option value="Channels">Channels</option>
-                  <option value="Users">Users</option>
+                  <option value="Channels" disabled>Channels</option>
+                  <option value="Users" disabled>Users</option>
                 </select>
                 <input
                   type="text"
