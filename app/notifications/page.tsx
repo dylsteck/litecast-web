@@ -1,26 +1,19 @@
 "use client"
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import PageLayout from "../components/PageLayout";
-import useNeynarNotifications from "../hooks/useNeynarNotifications";
-import { useLogin } from "../providers/NeynarProvider";
+import NotificationsFeed from "../components/NotificationsFeed";
+import Navigation from "../components/Navigation";
+import NavigationItem from "../components/Navigation/NavigationItem";
 
 export default function NotificationsPage() {
-  const { farcasterUser } = useLogin();
-  const { notifications, loading, error } = useNeynarNotifications(farcasterUser?.fid ?? 616);
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
   return (
-    <PageLayout title="Notifications" isSearch={false}>
-      <div>
-        {notifications && notifications.map((notification, index) => (
-          <div key={index}>
-            <p>{notification.type}</p>
-            <p>{notification.most_recent_timestamp}</p>
-          </div>
-        ))}
-      </div>
+    <PageLayout>
+      <Navigation>
+        <div className="p-2 pl-4 pr-4 flex flex-row gap-6 items-center">
+          <NavigationItem text="Notifications" />
+        </div>
+      </Navigation>
+      <NotificationsFeed />
     </PageLayout>
   );
 }

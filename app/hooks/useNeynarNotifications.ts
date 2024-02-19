@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { NeynarCastThreadV1Response, NeynarCastV1 } from './useNeynarThread';
+import { NeynarCastThreadV1Response } from './useNeynarThread';
+import { NeynarV1User } from '../types';
+import useSWRInfinite from 'swr/infinite';
 
 type NeynarV2Notifications = {
     notifications: Notification[];
@@ -8,7 +10,7 @@ type NeynarV2Notifications = {
     };
 }
 
-type Notification = {
+export type Notification = {
     object: string;
     most_recent_timestamp: string;
     type: string;
@@ -129,44 +131,34 @@ type Notification = {
     }[];
 }
 
-function useNeynarNotifications(userFid: number, cursor?: string) {
-  const [data, setData] = useState<Notification[] | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  if(userFid === 0){
-    throw new Error('You must pass userFID to useNeynarNotifications.');
-  }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`https://api.neynar.com/v2/farcaster/notifications?fid=${userFid}&limit=25${cursor && `&cursor=${cursor}`}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'api_key': process.env.NEXT_PUBLIC_NEYNAR_API_KEY as string,
-          }
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const json = await response.json() as NeynarV2Notifications;
-        setData(json.notifications);
-      } catch (e) {
-        if (e instanceof Error) {
-          setError(e);
-        }
-      } finally {
-        setLoading(false);
+export default function useNeynarNotifications(userFid: number) {
+    const apiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
+    if (!apiKey) throw new Error("No Neynar API key found in environment variables");
+  
+    const getKey = (pageIndex: number, previousPageData: NeynarV2Notifications | null) => {
+      const cursor = previousPageData?.next?.cursor;
+      if (previousPageData && !previousPageData.next) return null;
+      return `https://api.neynar.com/v2/farcaster/notifications?fid=${userFid}&limit=25${cursor && `&cursor=${cursor}`}`;
+    };
+  
+    const fetcher = (url: string) => fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        'api_key': apiKey,
+      },
+    }).then(res => res.json());
+  
+    const { data, size, setSize, error } = useSWRInfinite<NeynarV2Notifications>(getKey, fetcher);
+  
+    const notifications = data ? data.flatMap(page => page.notifications) : [];
+    const isLoading = !data && !error;
+    const isReachingEnd = data && !data[data.length - 1]?.next;
+  
+    const loadMore = () => {
+      if (!isReachingEnd) {
+        setSize(size + 1);
       }
     };
-
-    fetchData();
-  }, [userFid, cursor]);
-
-  return { notifications: data, loading, error };
-}
-
-export default useNeynarNotifications;
+  
+    return { notifications, isLoading, isReachingEnd, loadMore };
+  };

@@ -1,24 +1,5 @@
-import { useState, useEffect } from 'react';
-
-export type NeynarV1User = {
-  fid: number;
-  custodyAddress: string;
-  username: string;
-  displayName: string;
-  pfp: {
-      url: string;
-  };
-  profile: {
-      bio: {
-          text: string;
-          mentionedProfiles: any[];
-      };
-  };
-  followerCount: number;
-  followingCount: number;
-  verifications: string[];
-  activeStatus: string;
-}
+import React from 'react';
+import { type NeynarV1User } from '../types';
 
 interface NeynarV1UserResponse {
   result: {
@@ -26,23 +7,24 @@ interface NeynarV1UserResponse {
   };
 }
 
-function useNeynarUser(fid: number | null, username: string | null) {
-  const [data, setData] = useState<NeynarV1User | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
+function useNeynarUser(fid?: number, username?: string) {
+  const [data, setData] = React.useState<NeynarV1User | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<Error | null>(null);
 
   const NEYNAR_GET_USERV1_BY_FID_URL = `https://api.neynar.com/v1/farcaster/user?fid=${fid}`;
   const NEYNAR_GET_USERV1_BY_USERNAME_URL = `https://api.neynar.com/v1/farcaster/user-by-username?username=${username}`;
 
-  if(fid === null && username === null){
-    throw new Error('You must pass either fid or username to useNeynarUser.');
-  }
+  React.useEffect(() => {
+    if ((!fid || fid < 0) && (!username || username.length === 0)) {
+      // todo: throw more appropriate error codes
+      return;
+    }
 
-  useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(fid ? NEYNAR_GET_USERV1_BY_FID_URL : NEYNAR_GET_USERV1_BY_USERNAME_URL, {
+        const response = await fetch((fid && fid > 0) ? NEYNAR_GET_USERV1_BY_FID_URL : NEYNAR_GET_USERV1_BY_USERNAME_URL, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -64,7 +46,7 @@ function useNeynarUser(fid: number | null, username: string | null) {
     };
 
     fetchData();
-  }, [NEYNAR_GET_USERV1_BY_FID_URL, NEYNAR_GET_USERV1_BY_USERNAME_URL, fid]);
+  }, [NEYNAR_GET_USERV1_BY_FID_URL, NEYNAR_GET_USERV1_BY_USERNAME_URL, fid, username]);
 
   return { user: data, loading, error };
 }

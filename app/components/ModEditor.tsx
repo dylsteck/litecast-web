@@ -20,15 +20,13 @@ import { ChannelList } from "@mod-protocol/react-ui-shadcn/dist/components/chann
 import { ChannelPicker } from "@mod-protocol/react-ui-shadcn/dist/components/channel-picker";
 import { CastLengthUIIndicator } from "@mod-protocol/react-ui-shadcn/dist/components/cast-length-ui-indicator";
 import { createRenderMentionsSuggestionConfig } from "@mod-protocol/react-ui-shadcn/dist/lib/mentions";
-import { useLogin } from "../providers/NeynarProvider";
+import { useLogin, usePostCast } from "../providers/NeynarProvider";
 import { defaultRichEmbedMod } from "@mod-protocol/mod-registry";
 import { renderers } from "@mod-protocol/react-ui-shadcn/dist/renderers";
 import { RichEmbed } from "@mod-protocol/react";
 
 const MOD_API_URL = "https://api.modprotocol.org/api";
-const FCKIT_API_URL = "https://api.farcasterkit.com";
 
-// use our MOD_API_URL, self host our API, or use your own API.
 const getUrlMetadata = fetchUrlMetadata(MOD_API_URL);
 const getResults = getFarcasterMentions(MOD_API_URL);
 const getChannels = getFarcasterChannels(MOD_API_URL);
@@ -36,6 +34,7 @@ const getChannels = getFarcasterChannels(MOD_API_URL);
 // todo: make default state for hash null and change type to string | null
 export default function ModEditor({ hash }: { hash?: string }) {
   const { farcasterUser } = useLogin();
+  const postCast = usePostCast()
   const onSubmit = async ({
     text,
     embeds,
@@ -65,19 +64,14 @@ export default function ModEditor({ hash }: { hash?: string }) {
           : undefined,
         channel_id: channel?.id ? channel?.id : "",
       };
-      await fetch(`${FCKIT_API_URL}/neynar/cast`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(respBody),
-      });
+      await postCast(respBody);
     } catch (error) {
       console.error("Failed to post cast", error);
       alert(error);
       return false;
     }
     alert("Casted successfully!");
+    // todo: move to the modal so the modal shows this and the modal closes
     return true;
   };
 
@@ -106,7 +100,7 @@ export default function ModEditor({ hash }: { hash?: string }) {
     placeholderText: hash ? "Reply" : "Cast something",
   });
   return (
-    <div className="border-b border-black z-index-50">
+    <div className="z-index-50">
       <form onSubmit={handleSubmit}>
         <EditorContent
           editor={editor}

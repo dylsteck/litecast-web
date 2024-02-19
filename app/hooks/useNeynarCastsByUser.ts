@@ -1,44 +1,43 @@
 import { useState, useEffect } from 'react';
-import { NeynarCastThreadV1Response, NeynarCastV1 } from './useNeynarThread';
+import { type NeynarCastV1 } from '../types';
+import useSWRInfinite from 'swr/infinite';
 
-function useNeynarCastsByUser(userFid: number, viewerFid: number) {
-  const [data, setData] = useState<NeynarCastV1[] | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  if(userFid === 0 || viewerFid === 0){
-    throw new Error('You must pass either userFid or viewerFid to useNeynarCastsByUser.');
-  }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`https://api.neynar.com/v1/farcaster/casts?fid=${userFid}&viewerFid=${viewerFid}&limit=25`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'api_key': process.env.NEXT_PUBLIC_NEYNAR_API_KEY as string,
-          }
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const json = await response.json() as NeynarCastThreadV1Response;
-        setData(json.result.casts);
-      } catch (e) {
-        if (e instanceof Error) {
-          setError(e);
-        }
-      } finally {
-        setLoading(false);
-      }
+interface NeynarCastsByUserResponse {
+  result: {
+    casts: NeynarCastV1[];
+    next?: {
+      cursor: string;
     };
-
-    fetchData();
-  }, [userFid, viewerFid]);
-
-  return { casts: data, loading, error };
+  };
 }
 
-export default useNeynarCastsByUser;
+export default function useNeynarCastsByUser(userFid: number, viewerFid: number) {
+  const apiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
+  if (!apiKey) throw new Error("No Neynar API key found in environment variables");
+
+  const getKey = (pageIndex: number, previousPageData: NeynarCastsByUserResponse | null) => {
+    if (previousPageData && !previousPageData.result.next) return null;
+    return `https://api.neynar.com/v1/farcaster/casts?fid=${userFid}&viewerFid=${viewerFid}&limit=25&cursor=${previousPageData?.result?.next?.cursor || ''}`;
+  };
+
+  const fetcher = (url: string) => fetch(url, {
+    headers: {
+      'Accept': 'application/json',
+      'api_key': apiKey,
+    },
+  }).then(res => res.json());
+
+  const { data, size, setSize, error } = useSWRInfinite<NeynarCastsByUserResponse>(getKey, fetcher);
+
+  const casts = data ? data.flatMap(page => page.result.casts) : [];
+  const isLoading = !data && !error;
+  const isReachingEnd = data && !data[data.length - 1]?.result.next;
+
+  const loadMore = () => {
+    if (!isReachingEnd) {
+      setSize(size + 1);
+    }
+  };
+
+  return { casts, isLoading, isReachingEnd, loadMore };
+};

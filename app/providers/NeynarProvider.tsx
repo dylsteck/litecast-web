@@ -9,7 +9,6 @@ export interface FarcasterUser {
   displayName: string;
   profile: {
     bio?: string;
-    location?: string;
   };
   pfp: string;
   followerCount: number;
@@ -35,6 +34,7 @@ export interface Cast {
 export interface NeynarContextProps {
   farcasterUser: FarcasterUser | null;
   setFarcasterUser: React.Dispatch<React.SetStateAction<FarcasterUser | null>>;
+  postCast: (respBody: any) => Promise<void>;
   postReaction: (type: 'like' | 'recast', hash: string) => Promise<void>;
   apiKey: string;
   API_URL: string;
@@ -61,24 +61,24 @@ export const NeynarProvider: React.FC<{ children: React.ReactNode, apiKey: strin
     fetchData();
   }, []);
 
-  // const postCast = async (cast: any) => {
-  //   try {
-  //     const respBody = {
-  //       parent: cast.hash,
-  //       signer_uuid: farcasterUser?.signer_uuid,
-  //       text: cast.text,
-  //     };
-  //     await fetch(`${API_URL}/neynar/cast`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(cast),
-  //     });
-  //   } catch (error) {
-  //     console.error('Failed to post cast', error);
-  //   }
-  // };
+  const postCast = async (respBody: any) => {
+    try {
+      const response = await fetch(`https://api.neynar.com/v2/farcaster/cast`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'api_key': API_KEY,
+        },
+        body: JSON.stringify(respBody),
+      });
+      const castPostResponse = await response.json();
+      if(castPostResponse.message){
+        throw new Error(`Error posting a cast: ${castPostResponse.message}`)
+      }
+    } catch (error) {
+      console.error('Failed to post cast', error);
+    }
+  };
 
   const postReaction = async (type: 'like' | 'recast', hash: string) => {
     try {
@@ -100,7 +100,7 @@ export const NeynarProvider: React.FC<{ children: React.ReactNode, apiKey: strin
   };
 
   return (
-    <NeynarContext.Provider value={{ farcasterUser, setFarcasterUser, postReaction, apiKey, API_URL }}>
+    <NeynarContext.Provider value={{ farcasterUser, setFarcasterUser, postCast, postReaction, apiKey, API_URL }}>
       {children}
     </NeynarContext.Provider>
   );
@@ -120,6 +120,14 @@ export const useReaction = () => {
     throw Error('useReaction must be used within a NeynarProvider');
   }
   return context.postReaction;
+};
+
+export const usePostCast = () => {
+  const context = useContext(NeynarContext);
+  if (!context) {
+    throw Error('usePostCast must be used within a NeynarProvider');
+  }
+  return context.postCast;
 };
 
 export const useLatestCasts = (type = 'home', parentUrl = '') => {

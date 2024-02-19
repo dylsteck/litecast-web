@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { NeynarV1User } from "../hooks/useNeynarUser";
+import { type NeynarV1User } from "../types";
 
 export default function UserDetails({ neynarUser }: { neynarUser: NeynarV1User }){
     return(
@@ -13,8 +13,7 @@ export default function UserDetails({ neynarUser }: { neynarUser: NeynarV1User }
                     <div className="flex flex-row gap-2">
                         <p><span className="font-medium">{neynarUser.followerCount.toLocaleString()}</span> followers</p>
                         <p><span className="font-medium">{neynarUser.followingCount.toLocaleString()}</span>  following</p>
-                        {/* <p>New York City</p> */}
-                        {/* TODO: Add NeynarV2User and get neynarUser.profile.location */}
+                        {/* todo: get user location */}
                     </div>
                 </div>
             </div>

@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState, useCallback } from "react";
-import { Embed, NeynarCastV2, NeynarFrame } from "../types";
+import { NeynarCastV2, NeynarFrame } from "../types";
 import { useLogin } from "../providers/NeynarProvider";
+const neynarApiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
 
 function CastFrameBtn({ number, text, handleOnClick }: { number: number, text: string, handleOnClick: (btnNumber: number) => void }){
     return(
@@ -33,7 +34,7 @@ function CastFrame({ hash, frame, signerUuid }: { hash: string, frame: NeynarFra
                 method: "POST",
                 headers: {
                     "accept": "application/json",
-                    "api_key": "11BDFAF6-D4D4-460D-9E9F-7CB96DAB7D39",
+                    "api_key": neynarApiKey as string,
                     "content-type": "application/json"
                 },
                 body: JSON.stringify({
@@ -50,7 +51,6 @@ function CastFrame({ hash, frame, signerUuid }: { hash: string, frame: NeynarFra
             }) as Response;
             if (response.ok) {
                 const json = await response.json() as NeynarFrame;
-                console.log("new frame data", json);
                 setLocalFrame(json);
             } else {
                 throw new Error(`HTTP error! status: ${response.status}`);

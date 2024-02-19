@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
-import { useState } from "react";
+import React from "react";
 
 export const ExpandableImage = ({ imageUrl, rounded }: { imageUrl: string, rounded: boolean}) => {
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = React.useState(false);
 
     const handleImageClick = (event: React.MouseEvent<HTMLDivElement>) => {
       event.stopPropagation();

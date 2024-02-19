@@ -1,18 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import React from "react";
 import { useLogin } from "../providers/NeynarProvider";
-import useWarpcastUser from "../hooks/useWarpcastUser";
 import { LOCAL_STORAGE_FARCASTER_USER } from "../utils/consts";
 import { SIWNWindow, SIWNResponseData } from "../types";
+import useNeynarUser from "../hooks/useNeynarUser";
 
 declare let window: SIWNWindow;
 
 export default function SignInWithNeynar(){
     const { farcasterUser, setFarcasterUser } = useLogin();
-    const [signerUuid, setSignerUuid] = useState<string | null>(null);
-    const [fid, setFid] = useState<number | null>(null);
-    const { user: warpcastUser, loading, error } = useWarpcastUser(fid);
+    const [signerUuid, setSignerUuid] = React.useState<string | null>(null);
+    const [fid, setFid] = React.useState<number | null>(null);
+    const { user: neynarUser, loading: neynarLoading, error: neynarError } = useNeynarUser(fid === null ? 0 : fid, '');
     const neynarClientId = process.env.NEXT_PUBLIC_NEYNAR_CLIENT_ID;
 
     const onSignInSuccess = (data: SIWNResponseData) => {
@@ -20,27 +20,26 @@ export default function SignInWithNeynar(){
         setSignerUuid(data.signer_uuid);
     };
 
-    useEffect(() => {
-        if (warpcastUser && signerUuid) {
+    React.useEffect(() => {
+        if (neynarUser && signerUuid) {
           const farcasterUser = {
             signer_uuid: signerUuid,
-            fid: Number(warpcastUser.fid),
-            fname: warpcastUser?.username,
-            displayName: warpcastUser?.displayName,
+            fid: Number(neynarUser.fid),
+            fname: neynarUser?.username,
+            displayName: neynarUser?.displayName,
             profile: {
-              bio: warpcastUser.profile.bio.text,
-              location: warpcastUser.profile.location.placeId
+              bio: neynarUser.profile.bio.text,
             },
-            pfp: warpcastUser.pfp.url,
-            followerCount: warpcastUser?.followerCount,
-            followingCount: warpcastUser?.followingCount,
+            pfp: neynarUser.pfp.url,
+            followerCount: neynarUser?.followerCount,
+            followingCount: neynarUser?.followingCount,
           };
           localStorage.setItem(LOCAL_STORAGE_FARCASTER_USER, JSON.stringify(farcasterUser));
           setFarcasterUser(farcasterUser);
         }
-      }, [setFarcasterUser, signerUuid, warpcastUser]);
+      }, [setFarcasterUser, signerUuid, neynarUser]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         window.onSignInSuccess = onSignInSuccess;
 
         return () => {

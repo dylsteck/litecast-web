@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { NeynarCastV2 } from "../types";
+import { NeynarCastV2, SearchcasterCast } from "../types";
 import { GHOST_USER_PFP_URL } from "../utils/consts";
 import { FaComment, FaHeart } from "react-icons/fa";
 import { FaArrowsSpin } from "react-icons/fa6";
@@ -7,9 +7,7 @@ import { getRelativeTime } from "../utils/getRelativeTime";
 import Link from "next/link";
 import { ExpandableImage } from "./ExpandableImage";
 import CastReactionItem from "./CastReactionItem";
-import CastText from "./CastText";
 import CastEmbeds from "./CastFrames";
-import { SearchcasterCast } from "../search/page";
 
 
 export default function SearchCastItem({ cast }: { cast: SearchcasterCast }){
@@ -43,11 +41,10 @@ export default function SearchCastItem({ cast }: { cast: SearchcasterCast }){
                 </div>
                 <p className="pt-1 pr-2 whitespace-pre-line break-all max-w-full">
                     <Link href={`/${cast.body.username}/${cast.body.data.replyParentMerkleRoot || cast.body.data.threadMerkleRoot}`}>
-                        <CastText text={cast.body.data.text} />
+                        <p>{cast.body.data.text}</p>
                     </Link>
                     <div className="pt-2 pb-2 flex flex-row gap-3">
                         {cast.body.data.embeds && cast.body.data.embeds.images && renderImages()}
-                        {/* <CastEmbeds hash={cast.body.data.replyParentMerkleRoot} embeds={cast.body.data.embeds} /> */}
                     </div>
                 </p>
                 <div className="flex flex-row gap-2 pt-3 text-black/70 text-sm">
