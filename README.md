@@ -1,5 +1,8 @@
 ## litecast-web
 
+> ⚠️ **Update:** as of 12/15/2025 this repo has been archived in favor of the original [Litecast repo](https://github.com/dylsteck/litecast), which now supports both mobile and web thanks to Expo.
+
+
 The web version of [Litecast](https://github.com/dylsteck/litecast), the mobile(iOS-first) Farcaster client that I've been building.
 
 ### Status of `litecast-web`
